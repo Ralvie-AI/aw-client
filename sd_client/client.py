@@ -29,7 +29,8 @@ from .persistqueue.exceptions import Empty
 from .config import load_config
 from .singleinstance import SingleInstance
 
-
+os.environ.pop('HTTP_PROXY', None)
+os.environ.pop('HTTPS_PROXY', None)
 CACHE_KEY = "Sundial"
 
 # FIXME: This line is probably badly placed

@@ -7,7 +7,6 @@ import threading
 from collections import namedtuple
 from datetime import datetime
 from time import sleep
-from sd_core.cache import *
 from typing import (
     Any,
     Callable,
@@ -17,18 +16,23 @@ from typing import (
     Tuple,
     Union,
 )
-from sd_core.util import load_key
+
 import jwt
-import keyring
-from .persistqueue import SQLiteQueue
 import requests as req
+from .persistqueue import SQLiteQueue
+from .singleinstance import SingleInstance
+from .persistqueue.exceptions import Empty
+
+from sd_core.util import load_key
+from sd_core.cache import *
 from sd_core.dirs import get_data_dir
 from sd_core.models import Event
 from sd_transform.heartbeats import heartbeat_merge
-from .persistqueue.exceptions import Empty
 from .config import load_config
-from .singleinstance import SingleInstance
 
+
+os.environ.pop('HTTP_PROXY', None)
+os.environ.pop('HTTPS_PROXY', None)
 
 CACHE_KEY = "Sundial"
 

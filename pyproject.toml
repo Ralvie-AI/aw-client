@@ -22,7 +22,7 @@ requests = "*"
 click = "^8.0"
 tabulate = "*"
 typing-extensions = "*"
-charset-normalizer = "3.4.6"
+charset-normalizer = "3.4.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"

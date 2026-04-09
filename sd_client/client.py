@@ -23,6 +23,7 @@ import keyring
 from .persistqueue import SQLiteQueue
 import requests as req
 from sd_core.dirs import get_data_dir
+from sd_core.const import CACHE_KEY
 from sd_core.models import Event
 from sd_transform.heartbeats import heartbeat_merge
 from .persistqueue.exceptions import Empty
@@ -31,7 +32,6 @@ from .singleinstance import SingleInstance
 
 os.environ.pop('HTTP_PROXY', None)
 os.environ.pop('HTTPS_PROXY', None)
-CACHE_KEY = "Sundial"
 
 # FIXME: This line is probably badly placed
 logging.getLogger("requests").setLevel(logging.WARNING)

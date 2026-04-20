@@ -19,7 +19,6 @@ from typing import (
 )
 from sd_core.util import load_key
 import jwt
-import keyring
 from .persistqueue import SQLiteQueue
 import requests as req
 from sd_core.dirs import get_data_dir
@@ -89,7 +88,7 @@ def always_raise_for_request_errors(f: Callable[..., req.Response]):
 
     return g
 
-def _generate_token():
+def _generate_token() -> Optional[str]:
     """
      Generate a token to be used for authenticating with Sundial. This is a wrapper around jwt. encode which returns a JSON Web Token instead of a string.
      
@@ -164,6 +163,14 @@ class ActivityWatchClient:
          @return Full URL for API with server_address and api
         """
         return f"{self.server_address}/api/0/{endpoint}"
+    
+    def _get_headers(self) -> Dict[str, str]:
+        """Generate common request headers with authentication token."""
+        return {
+            "Content-type": "application/json",
+            "charset": "utf-8",
+            "Authorization": _generate_token()
+        }
 
     @always_raise_for_request_errors
     def _get(self, endpoint: str, params: Optional[dict] = None) -> req.Response:
@@ -174,9 +181,8 @@ class ActivityWatchClient:
          @param params - A dictionary of key value pairs to send with the request
          
          @return A : class : ` Response ` object that can be used to inspect the
-        """
-        headers = {"Content-type": "application/json", "charset": "utf-8", "Authorization" : _generate_token()}
-        return req.get(self._url(endpoint), params=params, headers=headers)
+        """        
+        return req.get(self._url(endpoint), params=params, headers=self._get_headers())
 
     @always_raise_for_request_errors
     def _post(
@@ -193,12 +199,11 @@ class ActivityWatchClient:
              @param params - A dictionary of key / value pairs that will be included in the request's query string.
              
              @return The response from the server or None if something went wrong
-        """
-        headers = {"Content-type": "application/json", "charset": "utf-8", "Authorization" : _generate_token()}
+        """        
         return req.post(
             self._url(endpoint),
             data=bytes(json.dumps(data), "utf8"),
-            headers=headers,
+            headers=self._get_headers(),
             params=params,
         )
 
@@ -212,8 +217,7 @@ class ActivityWatchClient:
          
          @return A : class : ` req. Response ` object
         """
-        headers = {"Content-type": "application/json", "Authorization" : _generate_token()}
-        return req.delete(self._url(endpoint), data=json.dumps(data), headers=headers)
+        return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers())
 
     def get_info(self):
         """
@@ -224,8 +228,7 @@ class ActivityWatchClient:
         """
         """Returns a dict currently containing the keys 'hostname' and 'testing'."""
         endpoint = "info"
-        headers = {"Content-type": "application/json", "charset": "utf-8", "Authorization" : _generate_token()}
-        return self._get(endpoint,headers=headers).json()
+        return self._get(endpoint,headers=self._get_headers()).json()
 
     #
     #   Event get/post requests
@@ -752,7 +755,7 @@ class RequestQueue(threading.Thread):
             if cached_credentials != None:
                 db_key = cached_credentials.get("encrypted_db_key")
             else:
-                db_key == None
+                db_key = None
             key = load_key("user_key")
             # True if the database key is None or the key is None.
             if db_key == None or key == None:

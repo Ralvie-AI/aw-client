@@ -7,7 +7,7 @@ import threading
 from collections import namedtuple
 from datetime import datetime
 from time import sleep
-from sd_core.cache import *
+from sd_core.cache import cache_user_credentials
 from typing import (
     Any,
     Callable,

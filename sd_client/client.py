@@ -7,7 +7,7 @@ import threading
 from collections import namedtuple
 from datetime import datetime
 from time import sleep
-from sd_core.cache import cache_user_credentials
+from sd_core.cache import credentials
 from typing import (
     Any,
     Callable,
@@ -95,7 +95,7 @@ def _generate_token() -> Optional[str]:
      
      @return JWT or None if there is no token to be
     """
-    cached_credentials = cache_user_credentials(CACHE_KEY)
+    cached_credentials = credentials()
     # Returns a JWT encoded string with the cached credentials.
     if cached_credentials:
         user_key = cached_credentials.get("user_key")
@@ -671,7 +671,8 @@ class RequestQueue(threading.Thread):
         # Create a directory if it doesn t exist.
         if not os.path.exists(queued_dir):
             os.makedirs(queued_dir)
-        cached_credentials = cache_user_credentials(CACHE_KEY)
+
+        cached_credentials = credentials()
         # If cache_user_credentials is set to True the user credentials are cached and stored in the cache file.
         if cached_credentials:
             user_email = cached_credentials.get("email")
@@ -750,13 +751,16 @@ class RequestQueue(threading.Thread):
         """
         try:  # Try to connect
             db_key = ""
-            cached_credentials = cache_user_credentials(CACHE_KEY)
+            key = None
+            cached_credentials = credentials()
             # Returns the encrypted db_key if the cached credentials are cached.
             if cached_credentials != None:
                 db_key = cached_credentials.get("encrypted_db_key")
+                key = cached_credentials.get("user_key")
             else:
                 db_key = None
-            key = load_key("user_key")
+                key = None 
+
             # True if the database key is None or the key is None.
             if db_key == None or key == None:
                 self.connected = False

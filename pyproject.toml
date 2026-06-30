@@ -16,10 +16,10 @@ packages = [
 sd-client = "sd_client.cli:main"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.11,<3.15"
 aw-core = "^0.5.7"
 platformdirs = "3.10"
-requests = "*"
+requests = "2.34.2"
 click = "^8.0"
 tabulate = "*"
 typing-extensions = "*"

@@ -17,7 +17,7 @@ from typing import (
     Tuple,
     Union,
 )
-from sd_core.util import load_key
+from sd_core.util import db_file_exists
 import jwt
 from .persistqueue import SQLiteQueue
 import requests as req
@@ -750,19 +750,19 @@ class RequestQueue(threading.Thread):
          @return True if connection succeeds
         """
         try:  # Try to connect
-            db_key = ""
+            db_key = False
             key = None
             cached_credentials = credentials()
             # Returns the encrypted db_key if the cached credentials are cached.
             if cached_credentials != None:
-                db_key = cached_credentials.get("encrypted_db_key")
+                db_key = db_file_exists()
                 key = cached_credentials.get("user_key")
             else:
-                db_key = None
+                db_key = False
                 key = None 
 
             # True if the database key is None or the key is None.
-            if db_key == None or key == None:
+            if db_key == False or key == None:
                 self.connected = False
                 return self.connected
             self._create_buckets()

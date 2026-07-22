@@ -22,7 +22,7 @@ import jwt
 from .persistqueue import SQLiteQueue
 import requests as req
 from sd_core.dirs import get_data_dir
-from sd_core.const import CACHE_KEY
+from sd_core.const import CACHE_KEY, CERT
 from sd_core.models import Event
 from sd_transform.heartbeats import heartbeat_merge
 from .persistqueue.exceptions import Empty
@@ -113,7 +113,7 @@ class ActivityWatchClient:
             testing=False,
             host=None,
             port=None,
-            protocol="http",
+            protocol="https",
     ) -> None:
         """
         A handy wrapper around the sd-server REST API. The recommended way of interacting with the server.
@@ -139,6 +139,8 @@ class ActivityWatchClient:
         self.server_address = "{protocol}://{host}:{port}".format(
             protocol=protocol, host=server_host, port=server_port
         )
+
+        print("self.server_address ", self.server_address)
 
         self.instance = SingleInstance(
             f"{self.client_name}-at-{server_host}-on-{server_port}"
@@ -182,7 +184,9 @@ class ActivityWatchClient:
          
          @return A : class : ` Response ` object that can be used to inspect the
         """        
-        return req.get(self._url(endpoint), params=params, headers=self._get_headers())
+        return req.get(self._url(endpoint), params=params, 
+                       headers=self._get_headers(),
+                       verify=str(CERT),)
 
     @always_raise_for_request_errors
     def _post(
@@ -205,6 +209,7 @@ class ActivityWatchClient:
             data=bytes(json.dumps(data), "utf8"),
             headers=self._get_headers(),
             params=params,
+            verify=str(CERT),
         )
 
     @always_raise_for_request_errors
@@ -217,7 +222,8 @@ class ActivityWatchClient:
          
          @return A : class : ` req. Response ` object
         """
-        return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers())
+        return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers(),
+                          verify=str(CERT),)
 
     def get_info(self):
         """
@@ -228,7 +234,8 @@ class ActivityWatchClient:
         """
         """Returns a dict currently containing the keys 'hostname' and 'testing'."""
         endpoint = "info"
-        return self._get(endpoint,headers=self._get_headers()).json()
+        return self._get(endpoint,headers=self._get_headers(),
+                         verify=str(CERT),).json()
 
     #
     #   Event get/post requests

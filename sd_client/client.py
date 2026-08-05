@@ -22,7 +22,7 @@ import jwt
 from .persistqueue import SQLiteQueue
 import requests as req
 from sd_core.dirs import get_data_dir
-from sd_core.const import CACHE_KEY, CERT
+from sd_core.const import CERT
 from sd_core.models import Event
 from sd_transform.heartbeats import heartbeat_merge
 from .persistqueue.exceptions import Empty
@@ -139,8 +139,6 @@ class ActivityWatchClient:
         self.server_address = "{protocol}://{host}:{port}".format(
             protocol=protocol, host=server_host, port=server_port
         )
-
-        print("self.server_address ", self.server_address)
 
         self.instance = SingleInstance(
             f"{self.client_name}-at-{server_host}-on-{server_port}"

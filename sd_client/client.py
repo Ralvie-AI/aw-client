@@ -22,7 +22,7 @@ import jwt
 from .persistqueue import SQLiteQueue
 import requests as req
 from sd_core.dirs import get_data_dir
-from sd_core.const import CERT
+from sd_core.const import CERT_FILE
 from sd_core.models import Event
 from sd_transform.heartbeats import heartbeat_merge
 from .persistqueue.exceptions import Empty
@@ -184,7 +184,7 @@ class ActivityWatchClient:
         """        
         return req.get(self._url(endpoint), params=params, 
                        headers=self._get_headers(),
-                       verify=str(CERT),)
+                       verify=str(CERT_FILE),)
 
     @always_raise_for_request_errors
     def _post(
@@ -207,7 +207,7 @@ class ActivityWatchClient:
             data=bytes(json.dumps(data), "utf8"),
             headers=self._get_headers(),
             params=params,
-            verify=str(CERT),
+            verify=str(CERT_FILE),
         )
 
     @always_raise_for_request_errors
@@ -221,7 +221,7 @@ class ActivityWatchClient:
          @return A : class : ` req. Response ` object
         """
         return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers(),
-                          verify=str(CERT),)
+                          verify=str(CERT_FILE),)
 
     def get_info(self):
         """
@@ -233,7 +233,7 @@ class ActivityWatchClient:
         """Returns a dict currently containing the keys 'hostname' and 'testing'."""
         endpoint = "info"
         return self._get(endpoint,headers=self._get_headers(),
-                         verify=str(CERT),).json()
+                         verify=str(CERT_FILE),).json()
 
     #
     #   Event get/post requests

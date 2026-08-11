@@ -109,7 +109,6 @@ def _generate_token():
                                             "phone": cached_credentials.get("phone")}, user_key, algorithm="HS256")
         else: return None
 
-
 class ActivityWatchClient:
     def __init__(
             self,
@@ -168,6 +167,14 @@ class ActivityWatchClient:
         """
         return f"{self.server_address}/api/0/{endpoint}"
 
+    def _get_headers(self) -> Dict[str, str]:
+        """Generate common request headers with authentication token."""
+        return {
+            "Content-type": "application/json",
+            "charset": "utf-8",
+            "Authorization": _generate_token()
+        }
+    
     @always_raise_for_request_errors
     def _get(self, endpoint: str, params: Optional[dict] = None) -> req.Response:
         """
@@ -178,9 +185,8 @@ class ActivityWatchClient:
          
          @return A : class : ` Response ` object that can be used to inspect the
         """
-        headers = {"Content-type": "application/json", "charset": "utf-8", "Authorization" : _generate_token()}
-        return req.get(self._url(endpoint), params=params, headers=headers)
-
+        return req.get(self._url(endpoint), params=params, headers=self._get_headers())
+    
     @always_raise_for_request_errors
     def _post(
             self,
@@ -197,11 +203,11 @@ class ActivityWatchClient:
              
              @return The response from the server or None if something went wrong
         """
-        headers = {"Content-type": "application/json", "charset": "utf-8", "Authorization" : _generate_token()}
+
         return req.post(
             self._url(endpoint),
             data=bytes(json.dumps(data), "utf8"),
-            headers=headers,
+            headers=self._get_headers(),
             params=params,
         )
 
@@ -215,8 +221,7 @@ class ActivityWatchClient:
          
          @return A : class : ` req. Response ` object
         """
-        headers = {"Content-type": "application/json", "Authorization" : _generate_token()}
-        return req.delete(self._url(endpoint), data=json.dumps(data), headers=headers)
+        return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers())
 
     def get_info(self):
         """
@@ -227,8 +232,7 @@ class ActivityWatchClient:
         """
         """Returns a dict currently containing the keys 'hostname' and 'testing'."""
         endpoint = "info"
-        headers = {"Content-type": "application/json", "charset": "utf-8", "Authorization" : _generate_token()}
-        return self._get(endpoint,headers=headers).json()
+        return self._get(endpoint,headers=self._get_headers()).json()
 
     #
     #   Event get/post requests

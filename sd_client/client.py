@@ -17,7 +17,6 @@ from typing import (
     Tuple,
     Union,
 )
-from sd_core.util import load_key
 import jwt
 from .persistqueue import SQLiteQueue
 import requests as req

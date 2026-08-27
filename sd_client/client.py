@@ -29,7 +29,7 @@ from sd_core.dirs import get_data_dir
 from sd_core.models import Event
 from sd_transform.heartbeats import heartbeat_merge
 from .config import load_config
-
+from sd_core.const import CERT_FILE
 
 os.environ.pop('HTTP_PROXY', None)
 os.environ.pop('HTTPS_PROXY', None)
@@ -116,7 +116,7 @@ class ActivityWatchClient:
             testing=False,
             host=None,
             port=None,
-            protocol="http",
+            protocol="https",
     ) -> None:
         """
         A handy wrapper around the sd-server REST API. The recommended way of interacting with the server.
@@ -185,7 +185,7 @@ class ActivityWatchClient:
          
          @return A : class : ` Response ` object that can be used to inspect the
         """
-        return req.get(self._url(endpoint), params=params, headers=self._get_headers())
+        return req.get(self._url(endpoint), params=params, headers=self._get_headers(), verify=str(CERT_FILE))
     
     @always_raise_for_request_errors
     def _post(
@@ -203,12 +203,12 @@ class ActivityWatchClient:
              
              @return The response from the server or None if something went wrong
         """
-
         return req.post(
             self._url(endpoint),
             data=bytes(json.dumps(data), "utf8"),
             headers=self._get_headers(),
             params=params,
+            verify=str(CERT_FILE),
         )
 
     @always_raise_for_request_errors
@@ -221,7 +221,7 @@ class ActivityWatchClient:
          
          @return A : class : ` req. Response ` object
         """
-        return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers())
+        return req.delete(self._url(endpoint), data=json.dumps(data), headers=self._get_headers(), verify=str(CERT_FILE),)
 
     def get_info(self):
         """
